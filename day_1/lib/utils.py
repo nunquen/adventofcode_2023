@@ -4,7 +4,7 @@ import re
 import urllib3
 
 
-debug = True
+debug = False
 
 number_list = [
     ["one", "1"],
