@@ -5,6 +5,9 @@ from lib.utils import (
     ScratchCard
 )
 
+'''
+Reference: https://adventofcode.com/2023/day/4
+'''
 
 def test():
     res = True
