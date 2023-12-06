@@ -1,8 +1,9 @@
 from lib.utils import (
-    get_resource,
     get_local_data_as_list,
+    get_near_location,
+    get_resource,
     LocalFile,
-    resource_mapping,
+    mapping,
 )
 
 '''
@@ -41,10 +42,14 @@ def test():
         "56 93 4",
     ]
     resources = get_resource(data=data)
-    assert len(resources["seeds"]) == 4
- 
-    rm = resource_mapping(resources=resources)
-    return res
+    resouces_mapped = mapping(source_data=resources)
+    assert resouces_mapped[0]["seed"] == 79
+    assert resouces_mapped[0]["location"] == 82
+
+    # Get nearest location
+    near_location = get_near_location(location_path=resouces_mapped)
+    assert near_location == 35
+    return near_location == 35
 
 
 if __name__ == "__main__":
@@ -52,10 +57,14 @@ if __name__ == "__main__":
     if not test():
         exit(1)
 
-    input_file = LocalFile.day1_input_file.value
+    input_file = LocalFile.day5_input_file.value
     input_data = get_local_data_as_list(input_file=input_file)
+    resources = get_resource(data=input_data)
+    resouces_mapped = mapping(source_data=resources)
+    # Get nearest location
+    near_location = get_near_location(location_path=resouces_mapped)
 
-    print("Day #5. Get Scratch Cards values part 1. Value: {} ".format(
-        None
+    print("Day #5. Get Near location Value: {} ".format(
+        near_location
         )
     )

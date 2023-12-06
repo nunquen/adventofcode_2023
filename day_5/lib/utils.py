@@ -1,6 +1,6 @@
 import copy
 from enum import Enum
-from typing import List
+from typing import Dict, List
 
 debug = False
 
@@ -17,7 +17,7 @@ class ResourceRelation(Enum):
 
 
 class LocalFile(Enum):
-    day1_input_file = "day_5/input/values.txt"
+    day5_input_file = "day_5/input/values.txt"
 
 
 def get_local_data_as_list(input_file: str) -> List:
@@ -48,7 +48,7 @@ def get_resource(data: List) -> List:
     local_range = {
         "destination_range_start": 0,
         "source_range_start": 0,
-        "rage_legnth": 0
+        "range_length": 0
     }
     resources = {
         "seeds": [],
@@ -104,16 +104,35 @@ def get_resource(data: List) -> List:
         numbers = [int(num.strip()) for num in line.split()]
         local_range["destination_range_start"] = numbers[0]
         local_range["source_range_start"] = numbers[1]
-        local_range["rage_legnth"] = numbers[2]
+        local_range["range_length"] = numbers[2]
 
         resources[allocate_data].append(copy.deepcopy(local_range))
 
     return resources
 
 
-def resource_mapping(resources: List) -> List[dict]:
-    entire_map = []
-    resource_map = {
+def get_destination_number(
+    source_number: int,
+    ranges: List[int]
+) -> int:
+    destination_number = source_number
+
+    for current_range in ranges:
+        source_rs = current_range["source_range_start"]
+        range_length = current_range["range_length"]
+        destination_rs = current_range["destination_range_start"]
+
+        if source_number >= source_rs and\
+                source_number <= source_rs + range_length:
+            destination_number = source_number - source_rs + destination_rs
+            return destination_number
+
+    return destination_number
+
+
+def mapping(source_data: List) -> List:
+    location_paths = []
+    location_path = {
         "seed": 0,
         "soil": 0,
         "fertilizer": 0,
@@ -121,44 +140,61 @@ def resource_mapping(resources: List) -> List[dict]:
         "light": 0,
         "temperature": 0,
         "humidity": 0,
-        "location": 0
+        "location": 0,
     }
-    for seed_to_soil in resources[ResourceRelation.seed_to_soil.value]:
-        for num in range(seed_to_soil["rage_legnth"]):
-            local_resource_map = copy.deepcopy(resource_map)
-            local_resource_map["seed"] = seed_to_soil["source_range_start"] + num
-            local_resource_map["soil"] = seed_to_soil["destination_range_start"] + num
-            entire_map.append(local_resource_map)
 
-    # Fill the rest of seeds
-    # Get max seed
-    max_seed = max(resources["seeds"])
+    for seed in source_data["seeds"]:
+        # Get related soil
+        soil = get_destination_number(
+            source_number=seed,
+            ranges=source_data[ResourceRelation.seed_to_soil.value]
+        )
+        # Get related fertilizer
+        fertilizer = get_destination_number(
+            source_number=soil,
+            ranges=source_data[ResourceRelation.soil_to_fertilizer.value]
+        )
+        # Get related water
+        water = get_destination_number(
+            source_number=fertilizer,
+            ranges=source_data[ResourceRelation.fertilizer_to_water.value]
+        )
+        # Get related light
+        light = get_destination_number(
+            source_number=water,
+            ranges=source_data[ResourceRelation.water_to_light.value]
+        )
+        # Get related temperature
+        temperature = get_destination_number(
+            source_number=light,
+            ranges=source_data[ResourceRelation.light_to_temperature.value]
+        )
+        # Get related humidity
+        humidity = get_destination_number(
+            source_number=temperature,
+            ranges=source_data[ResourceRelation.temperature_to_humidity.value]
+        )
+        # Get related location
+        location = get_destination_number(
+            source_number=humidity,
+            ranges=source_data[ResourceRelation.humidity_to_location.value]
+        )
 
-    for num in range(max_seed):
-        check = list(filter(lambda mapping: mapping["seed"] == num, entire_map))
-        if len(check) > 0:
-            continue
+        location_path["seed"] = seed
+        location_path["soil"] = soil
+        location_path["fertilizer"] = fertilizer
+        location_path["water"] = water
+        location_path["light"] = light
+        location_path["temperature"] = temperature
+        location_path["humidity"] = humidity
+        location_path["location"] = location
 
-        local_resource_map = copy.deepcopy(resource_map)
-        local_resource_map["seed"] = num
-        local_resource_map["soil"] = num
-        entire_map.append(local_resource_map)
+        local_location_path = copy.deepcopy(location_path)
+        location_paths.append(local_location_path)
 
-    # Setting fertilizer
-    for soil_to_fertilizer in resources[ResourceRelation.soil_to_fertilizer.value]:
-        for num in range(soil_to_fertilizer["rage_legnth"]):
-            # Checking if the current soil already exists
-            local_resource_map_list = list(
-                filter(
-                    lambda mapping:
-                        mapping["soil"] == soil_to_fertilizer["source_range_start"] + num,
-                    entire_map
-                    )
-                )
-            if len(local_resource_map_list) == 0:
-                continue
+    return location_paths
 
-            local_resource_map = local_resource_map_list[0]
-            local_resource_map["fertilizer"] = soil_to_fertilizer["destination_range_start"] + num
 
-    return entire_map
+def get_near_location(location_path: List[Dict]) -> int:
+    sources = min(location_path, key=lambda x: x["location"])
+    return sources["location"]
