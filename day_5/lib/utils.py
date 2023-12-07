@@ -198,3 +198,14 @@ def mapping(source_data: List) -> List:
 def get_near_location(location_path: List[Dict]) -> int:
     sources = min(location_path, key=lambda x: x["location"])
     return sources["location"]
+
+
+# Part2
+def get_more_seeds(seeds: List[int]) -> List[int]:
+    more_seeds = []
+    for num in range(0, len(seeds), 2):
+        for num2 in range(seeds[num+1]):
+            if seeds[num] + num2 not in more_seeds:
+                more_seeds.append(seeds[num] + num2)
+
+    return more_seeds

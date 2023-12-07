@@ -1,5 +1,6 @@
 from lib.utils import (
     get_local_data_as_list,
+    get_more_seeds,
     get_near_location,
     get_resource,
     LocalFile,
@@ -12,7 +13,6 @@ Reference: https://adventofcode.com/2023/day/5
 
 
 def test():
-    res = True
     data = [
         "seeds: 79 14 55 13",
         "seed_to_soil map:",
@@ -49,7 +49,16 @@ def test():
     # Get nearest location
     near_location = get_near_location(location_path=resouces_mapped)
     assert near_location == 35
-    return near_location == 35
+
+    # Part2
+    more_seeds = get_more_seeds(seeds=resources["seeds"])
+    resources["seeds"] = more_seeds
+    resouces_mapped = mapping(source_data=resources)
+
+    # Get nearest location
+    near_location = get_near_location(location_path=resouces_mapped)
+    assert near_location == 46
+    return near_location == 46
 
 
 if __name__ == "__main__":
@@ -65,6 +74,18 @@ if __name__ == "__main__":
     near_location = get_near_location(location_path=resouces_mapped)
 
     print("Day #5. Get Near location Value: {} ".format(
+        near_location
+        )
+    )
+
+    # Part2
+    more_seeds = get_more_seeds(seeds=resources["seeds"])
+    resources["seeds"] = more_seeds
+    resouces_mapped = mapping(source_data=resources)
+
+    # Get nearest location
+    near_location = get_near_location(location_path=resouces_mapped)
+    print("Day #5. Get Near location Value Part2: {} ".format(
         near_location
         )
     )
