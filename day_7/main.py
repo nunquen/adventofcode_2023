@@ -27,7 +27,16 @@ def test():
     for card in sorted:
         total_winnings += (card._bet * card._rank)
 
-    return total_winnings == 6440
+    assert total_winnings == 6440
+
+    # Part2: Use Joker
+    group_hands = group_hands_by_strength(hands=hands, use_joker=True)
+    sorted = sort_and_rank_grouped_hands(grouped=group_hands, use_joker=True)
+    total_winnings_with_joker = 0
+    for card in sorted:
+        total_winnings_with_joker += (card._bet * card._rank)
+
+    return total_winnings_with_joker == 5905
 
 
 if __name__ == "__main__":
@@ -49,3 +58,18 @@ if __name__ == "__main__":
         total_winnings
         )
     )
+
+    # Part2: Use Joker
+    group_hands = group_hands_by_strength(hands=hands, use_joker=True)
+    sorted = sort_and_rank_grouped_hands(grouped=group_hands, use_joker=True)
+    total_winnings_with_joker = 0
+    for card in sorted:
+        total_winnings_with_joker += (card._bet * card._rank)
+
+    print("Day #7. Total winning Part2. Value: {} ".format(
+        total_winnings_with_joker
+        )
+    )
+
+    for card in sorted:
+        print("{} - {}".format(card._cards, card._joker_cards))

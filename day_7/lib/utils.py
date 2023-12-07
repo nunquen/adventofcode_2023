@@ -43,6 +43,10 @@ class Hand:
         self._strength = Hand.get_hand_strength(hand=self._cards)
         self._numeric_value = self.get_numeric_power()
         self._rank = 0
+        # Part2
+        self._joker_cards = Hand.use_joker(cards=self._cards, ranks=self.ranks)
+        self._joker_strength = Hand.get_hand_strength(hand=self._joker_cards)
+        self._joker_numeric_value = self.get_numeric_power(use_joker=True)
 
     @staticmethod
     def get_hand_strength(
@@ -76,18 +80,73 @@ class Hand:
 
         return Strength.two_pair
 
-    def get_numeric_power(self) -> int:
+    def get_numeric_power(self, use_joker: bool = False) -> int:
         power = 0
         base = 10000000000
         for num in range(5):
-            card = list(
-                filter(
-                    lambda x: x["Card"] == self._cards[num], self.ranks
-                ))
+            if use_joker:
+                card = list(
+                    filter(
+                        lambda x: x["Card"] == self._joker_cards[num],
+                        self.ranks
+                    ))
+            else:
+                card = list(
+                    filter(
+                        lambda x: x["Card"] == self._cards[num],
+                        self.ranks
+                    ))
             power += card[0]["Value"] * base
             base /= 100
 
         return power
+
+    # Part2: Use Joker
+    @staticmethod
+    def use_joker(cards: str, ranks: List) -> str:
+        # Getting the common card to replace the joker
+        common_card = None
+        times = 0
+
+        if "J" not in cards:
+            return cards
+
+        for card in cards:
+            if card == "J":
+                continue
+
+            if common_card is None:
+                common_card = card
+                times = cards.count(card)
+                continue
+
+            if cards.count(card) > times:
+                common_card = card
+                times = cards.count(card)
+
+            elif cards.count(card) == times:
+                # If the card has the same count as the common card then 
+                # We consider its value for being replaced by the Joker
+                rank = list(
+                    filter(
+                        lambda x: x["Card"] == card, ranks
+                    ))
+                rank = rank[0]["Value"]
+
+                common_card_rank = list(
+                    filter(
+                        lambda x: x["Card"] == common_card, ranks
+                    ))
+                common_card_rank = common_card_rank[0]["Value"]
+
+                if rank > common_card_rank:
+                    common_card = card
+
+        # replacing the Joker with the common card
+        if common_card is not None:
+            cards = cards.replace("J", common_card)
+
+        return cards
 
 
 def get_local_data_as_list(input_file: str) -> List:
@@ -117,19 +176,24 @@ def get_hands_from_data(
 
 
 def group_hands_by_strength(
-    hands: List[Hand]
+    hands: List[Hand],
+    use_joker: bool = False
 ) -> List:
     grouped_hands = [
         ["Not to be used"], [], [], [], [], [], [], []
     ]
     for hand in hands:
-        grouped_hands[hand._strength.value].append(hand)
+        if use_joker:
+            grouped_hands[hand._joker_strength.value].append(hand)
+        else:
+            grouped_hands[hand._strength.value].append(hand)
 
     return grouped_hands
 
 
 def sort_and_rank_grouped_hands(
-    grouped: List[List]
+    grouped: List[List],
+    use_joker: bool = False
 ) -> List[Hand]:
     sorted_and_ranked = []
     global_rank = 1
@@ -141,7 +205,11 @@ def sort_and_rank_grouped_hands(
         if len(group_hands) == 0:
             continue
 
-        group_hands.sort(key=lambda x: x._numeric_value, reverse=False)
+        if use_joker:
+            group_hands.sort(key=lambda x: x._joker_numeric_value, reverse=False)
+        else:
+            group_hands.sort(key=lambda x: x._numeric_value, reverse=False)
+
         for card in group_hands:
             card._rank = global_rank
             global_rank += 1
