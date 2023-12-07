@@ -46,7 +46,6 @@ class Hand:
         # Part2
         self._joker_cards = Hand.use_joker(cards=self._cards, ranks=self.ranks)
         self._joker_strength = Hand.get_hand_strength(hand=self._joker_cards)
-        self._joker_numeric_value = self.get_numeric_power(use_joker=True)
 
     @staticmethod
     def get_hand_strength(
@@ -80,22 +79,15 @@ class Hand:
 
         return Strength.two_pair
 
-    def get_numeric_power(self, use_joker: bool = False) -> int:
+    def get_numeric_power(self) -> int:
         power = 0
         base = 10000000000
         for num in range(5):
-            if use_joker:
-                card = list(
-                    filter(
-                        lambda x: x["Card"] == self._joker_cards[num],
-                        self.ranks
-                    ))
-            else:
-                card = list(
-                    filter(
-                        lambda x: x["Card"] == self._cards[num],
-                        self.ranks
-                    ))
+            card = list(
+                filter(
+                    lambda x: x["Card"] == self._cards[num],
+                    self.ranks
+                ))
             power += card[0]["Value"] * base
             base /= 100
 
@@ -192,8 +184,7 @@ def group_hands_by_strength(
 
 
 def sort_and_rank_grouped_hands(
-    grouped: List[List],
-    use_joker: bool = False
+    grouped: List[List]
 ) -> List[Hand]:
     sorted_and_ranked = []
     global_rank = 1
@@ -205,10 +196,7 @@ def sort_and_rank_grouped_hands(
         if len(group_hands) == 0:
             continue
 
-        if use_joker:
-            group_hands.sort(key=lambda x: x._joker_numeric_value, reverse=False)
-        else:
-            group_hands.sort(key=lambda x: x._numeric_value, reverse=False)
+        group_hands.sort(key=lambda x: x._numeric_value, reverse=False)
 
         for card in group_hands:
             card._rank = global_rank

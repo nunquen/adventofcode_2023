@@ -31,7 +31,7 @@ def test():
 
     # Part2: Use Joker
     group_hands = group_hands_by_strength(hands=hands, use_joker=True)
-    sorted = sort_and_rank_grouped_hands(grouped=group_hands, use_joker=True)
+    sorted = sort_and_rank_grouped_hands(grouped=group_hands)
     total_winnings_with_joker = 0
     for card in sorted:
         total_winnings_with_joker += (card._bet * card._rank)
@@ -61,7 +61,7 @@ if __name__ == "__main__":
 
     # Part2: Use Joker
     group_hands = group_hands_by_strength(hands=hands, use_joker=True)
-    sorted = sort_and_rank_grouped_hands(grouped=group_hands, use_joker=True)
+    sorted = sort_and_rank_grouped_hands(grouped=group_hands)
     total_winnings_with_joker = 0
     for card in sorted:
         total_winnings_with_joker += (card._bet * card._rank)
@@ -70,6 +70,3 @@ if __name__ == "__main__":
         total_winnings_with_joker
         )
     )
-
-    for card in sorted:
-        print("{} - {}".format(card._cards, card._joker_cards))
