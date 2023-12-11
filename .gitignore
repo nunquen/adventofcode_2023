@@ -114,4 +114,4 @@ env.bak/
 venv.bak/
 pythonenv*
 
-.pyc
+*.pyc

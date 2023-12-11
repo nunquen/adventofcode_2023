@@ -1,4 +1,5 @@
 import itertools
+import numpy as np
 from enum import Enum
 from typing import List, Tuple
 
@@ -28,16 +29,13 @@ def get_local_data_as_list(input_file: str) -> List:
     return content
 
 
-def transpose(l1, l2):
-    # iterate over list l1 to the length of an item
-    for i in range(len(l1[0])):
-        # print(i)
-        row = []
-        for item in l1:
-            # appending to new list with values and index positions
-            # i contains index position and item contains values
-            row.append(item[i])
-        l2.append(row)
+def transpose(l1):
+    l2 = []
+    # Convert string to list of characters
+    for i in range(len(l1)):
+        l2.append(list(l1[i]))
+    # Transposing
+    l2 = np.array(l2).T.tolist()
     return l2
 
 
@@ -49,33 +47,50 @@ def get_pairs(galaxies: int) -> List[tuple]:
     return combinations
 
 
-def expand_universe(universe: List[str]) -> any:
+def expand_universe(
+    universe: List[str],
+    expansion: int = 1
+):
     new_universe = []
     # Expand rows
     for num in range(len(universe)):
         new_universe.append(universe[num])
         if Galaxy.character.value not in universe[num]:
-            new_universe.append(universe[num])
+            # Part2: expand the universe more and more...
+            if expansion == 1:
+                new_universe.append(universe[num])
+                continue
+
+            # for expansion_index in range(expansion-1):
+            #     new_universe.append(universe[num])
+            new_universe += [universe[num]] * (expansion - 1)
 
     # Transpose rows with columns
     universe = transpose(
-        l1=new_universe,
-        l2=[]
+        l1=new_universe
     )
     new_universe = []
     # Expand rows
     for num in range(len(universe)):
         new_universe.append(universe[num])
         if Galaxy.character.value not in universe[num]:
-            new_universe.append(universe[num])
+            # Part2: expand the universe more and more...
+            if expansion == 1:
+                new_universe.append(universe[num])
+                continue
+
+            # for expansion_index in range(expansion-1):
+            #     new_universe.append(universe[num])
+            new_universe += [universe[num]] * (expansion - 1)
 
     # Flipping back again the entire universe
-    new_universe = transpose(
-        l1=new_universe,
-        l2=[]
+    universe = transpose(
+        l1=new_universe
     )
 
-    return new_universe
+    new_universe = None
+    return universe
+
 
 
 def get_position(
@@ -97,7 +112,7 @@ def rename_galaxies(universe: List) -> (List, int):
                 universe[num][index] = galaxy_name
                 galaxy_name += 1
 
-    return universe, galaxy_name - 1
+    return galaxy_name - 1
 
 
 def calculate_path_steps(
