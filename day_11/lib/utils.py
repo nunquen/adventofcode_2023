@@ -29,13 +29,21 @@ def get_local_data_as_list(input_file: str) -> List:
     return content
 
 
-def transpose(l1):
+def transpose(l1: List):
     l2 = []
     # Convert string to list of characters
-    for i in range(len(l1)):
-        l2.append(list(l1[i]))
+    if isinstance(l1[1], str):
+        for i in range(len(l1)):
+            l2.append(list(l1[i]))
+
     # Transposing
-    l2 = np.array(l2).T.tolist()
+        l3 = np.array(l2).T.tolist()
+        l2 = None
+        return l3
+    else:
+        l2 = np.array(l1).T.tolist()
+
+    l1 = None
     return l2
 
 
@@ -90,7 +98,6 @@ def expand_universe(
 
     new_universe = None
     return universe
-
 
 
 def get_position(

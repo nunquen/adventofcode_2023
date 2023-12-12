@@ -81,36 +81,46 @@ def test():
 
 if __name__ == "__main__":
 
-    # if not test():
-    #     exit(1)
+    if not test():
+        exit(1)
 
+    print("Day 11. Tests passed!")
+
+    print("Day 11 Part1")
     input_file = LocalFile.day_input_file.value
     input_data = get_local_data_as_list(input_file=input_file)
 
-    # universe = expand_universe(universe=input_data)
-    # galaxies = rename_galaxies(universe=universe)
-    # pairs = get_pairs(galaxies=galaxies)
-    # steps = 0
-    # for pair in pairs:
-    #     step = calculate_path_steps(
-    #         universe=universe,
-    #         galaxy1=pair[0],
-    #         galaxy2=pair[1]
-    #     )
+    print("  Expanding the universe")
+    universe = expand_universe(universe=input_data)
+    print("  Renaming galaxies")
+    galaxies = rename_galaxies(universe=universe)
+    pairs = get_pairs(galaxies=galaxies)
+    print("  Calculating steps for {} paths".format(len(pairs)))
+    steps = 0
+    for pair in pairs:
+        step = calculate_path_steps(
+            universe=universe,
+            galaxy1=pair[0],
+            galaxy2=pair[1]
+        )
 
-    #     steps += step
+        steps += step
 
-    # print("Day 11. Steps to reach destination. Part1. Value: {} ".format(
-    #     steps
-    #     )
-    # )
-
+    print("Day 11. Steps to reach destination. Part1. Value: {} ".format(
+        steps
+        )
+    )
+    print("Day 11 Part2")
+    print("  Expanding the universe")
     universe = expand_universe(
         universe=input_data,
         expansion=1000000
     )
+    print("  Renaming galaxies")
     universe, galaxies = rename_galaxies(universe=universe)
+    print("  Getting pairs")
     pairs = get_pairs(galaxies=galaxies)
+    print("  Calculating steps for {} paths".format(len(pairs)))
     steps = 0
     for num in range(len(pairs)):
         step = calculate_path_steps(
