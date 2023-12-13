@@ -108,7 +108,8 @@ if __name__ == "__main__":
         step = calculate_path_steps(
             universe=universe,
             galaxy1=pair[0],
-            galaxy2=pair[1]
+            galaxy2=pair[1],
+            expansion=1
         )
 
         steps += step
@@ -118,13 +119,14 @@ if __name__ == "__main__":
         )
     )
     print("Day 11 Part2")
-    print("  Expanding the universe")
+    expansion = 1000000
+    print("  Expanding the universe by x{}".format(expansion))
     universe = expand_universe(
         universe=input_data,
-        expansion=1000000
+        expansion=expansion
     )
     print("  Renaming galaxies")
-    universe, galaxies = rename_galaxies(universe=universe)
+    galaxies = rename_galaxies(universe=universe)
     print("  Getting pairs")
     pairs = get_pairs(galaxies=galaxies)
     print("  Calculating steps for {} paths".format(len(pairs)))
@@ -133,7 +135,8 @@ if __name__ == "__main__":
         step = calculate_path_steps(
             universe=universe,
             galaxy1=pairs[num][0],
-            galaxy2=pairs[num][1]
+            galaxy2=pairs[num][1],
+            expansion=expansion
         )
 
         steps += step
