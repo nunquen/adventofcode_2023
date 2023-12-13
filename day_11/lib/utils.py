@@ -12,6 +12,7 @@ class LocalFile(Enum):
 
 class Galaxy(Enum):
     character = "#"
+    empty_space = "E"
 
 
 def get_local_data_as_list(input_file: str) -> List:
@@ -55,6 +56,15 @@ def get_pairs(galaxies: int) -> List[tuple]:
     return combinations
 
 
+def prepare_universe(universe: List[str]) -> List[List]:
+    new_universe = []
+    for num in range(len(universe)):
+        if isinstance(universe[num], str):
+            new_universe.append(list(universe[num]))
+
+    return new_universe
+
+
 def expand_universe(
     universe: List[str],
     expansion: int = 1
@@ -62,34 +72,32 @@ def expand_universe(
     new_universe = []
     # Expand rows
     for num in range(len(universe)):
-        new_universe.append(universe[num])
         if Galaxy.character.value not in universe[num]:
             # Part2: expand the universe more and more...
-            if expansion == 1:
-                new_universe.append(universe[num])
-                continue
-
-            # for expansion_index in range(expansion-1):
-            #     new_universe.append(universe[num])
-            new_universe += [universe[num]] * (expansion - 1)
+            new_universe.append(
+                [s.replace(
+                    ".",
+                    "E{}".format(expansion + 1)) for s in universe[num]]
+            )
+        else:
+            new_universe.append(universe[num])
 
     # Transpose rows with columns
-    universe = transpose(
+    flipped_universe = transpose(
         l1=new_universe
     )
     new_universe = []
     # Expand rows
-    for num in range(len(universe)):
-        new_universe.append(universe[num])
-        if Galaxy.character.value not in universe[num]:
-            # Part2: expand the universe more and more...
-            if expansion == 1:
-                new_universe.append(universe[num])
-                continue
-
-            # for expansion_index in range(expansion-1):
-            #     new_universe.append(universe[num])
-            new_universe += [universe[num]] * (expansion - 1)
+    for num in range(len(flipped_universe)):
+        if Galaxy.character.value not in flipped_universe[num]:
+            # Part2: expand the flipped_universe more and more...
+            new_universe.append(
+                [s.replace(
+                    ".",
+                    "E{}".format(expansion + 1)) for s in flipped_universe[num]]
+            )
+        else:
+            new_universe.append(flipped_universe[num])
 
     # Flipping back again the entire universe
     universe = transpose(
@@ -97,6 +105,7 @@ def expand_universe(
     )
 
     new_universe = None
+    flipped_universe = None
     return universe
 
 
@@ -125,12 +134,38 @@ def rename_galaxies(universe: List) -> (List, int):
 def calculate_path_steps(
     universe: List,
     galaxy1: int,
-    galaxy2: int
+    galaxy2: int,
+    expansion: int = 1
 ) -> int:
     galaxy1_position = get_position(universe=universe, galaxy_name=galaxy1)
     galaxy2_position = get_position(universe=universe, galaxy_name=galaxy2)
 
-    steps = abs(galaxy1_position[0] - galaxy2_position[0]) + \
-        abs(galaxy1_position[1] - galaxy2_position[1])
+    # Part2: empty space is in cells begginging with E.
+    #        Ex: E4 means 4 empty spaces
+    empty_space_in_rows = 0
+    min_row_position = min(galaxy1_position[0], galaxy2_position[0])
+    max_row_position = max(galaxy1_position[0], galaxy2_position[0])
+    for num in range(max_row_position - min_row_position):
+        # Check if the entire row holds expanded space
+        times = universe[min_row_position + num + 1].count(
+            "{}{}".format(
+                Galaxy.empty_space.value,
+                expansion + 1
+            )
+        )
+        if times == len(universe[min_row_position + num + 1]):
+            empty_space_in_rows += 1
+
+    # Calculating expanded empty space between columns
+    min_col_position = min(galaxy1_position[1], galaxy2_position[1])
+    max_col_position = max(galaxy1_position[1], galaxy2_position[1])
+    empty_space_btwn_cols = universe[0][
+            min_col_position:max_col_position
+        ].count(
+            "E{}".format(expansion + 1)
+        )
+    expansion = expansion - 1 if expansion > 1 else expansion
+    steps = (max_row_position - min_row_position + empty_space_in_rows * expansion) + \
+        max_col_position - min_col_position + empty_space_btwn_cols * expansion
 
     return steps

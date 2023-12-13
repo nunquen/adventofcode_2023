@@ -4,7 +4,8 @@ from lib.utils import (
     expand_universe,
     rename_galaxies,
     get_pairs,
-    calculate_path_steps
+    calculate_path_steps,
+    prepare_universe
 )
 
 '''
@@ -27,7 +28,8 @@ def test():
         "#...#.....",
     ]
 
-    universe = expand_universe(universe=input_data)
+    universe = prepare_universe(universe=input_data)
+    universe = expand_universe(universe=universe)
     galaxies = rename_galaxies(universe=universe)
     pairs = get_pairs(galaxies=galaxies)
     steps = 0
@@ -35,15 +37,17 @@ def test():
         step = calculate_path_steps(
             universe=universe,
             galaxy1=pair[0],
-            galaxy2=pair[1]
+            galaxy2=pair[1],
+            expansion=1
         )
 
         steps += step
 
     assert steps == 374
 
+    universe = prepare_universe(universe=input_data)
     universe = expand_universe(
-        universe=input_data,
+        universe=universe,
         expansion=10
     )
     galaxies = rename_galaxies(universe=universe)
@@ -53,14 +57,16 @@ def test():
         step = calculate_path_steps(
             universe=universe,
             galaxy1=pair[0],
-            galaxy2=pair[1]
+            galaxy2=pair[1],
+            expansion=10
         )
 
         steps += step
     assert steps == 1030
 
+    universe = prepare_universe(universe=input_data)
     universe = expand_universe(
-        universe=input_data,
+        universe=universe,
         expansion=100
     )
     galaxies = rename_galaxies(universe=universe)
@@ -70,7 +76,8 @@ def test():
         step = calculate_path_steps(
             universe=universe,
             galaxy1=pair[0],
-            galaxy2=pair[1]
+            galaxy2=pair[1],
+            expansion=100
         )
 
         steps += step
